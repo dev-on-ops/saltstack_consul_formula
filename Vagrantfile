@@ -1,6 +1,6 @@
 vagrant_nodes = [
   {
-    :node       => "vaultmgmt01",
+    :node       => "consulmgmt01",
     :ip         => "192.168.255.11",
     :os         => "hashicorp/bionic64",
     :cpu        => "2",
@@ -8,71 +8,63 @@ vagrant_nodes = [
     :salt_type  => "master"
   },
   {
-    :node       => "vaulthaproxy01",
+    :node       => "consulserver01",
     :ip         => "192.168.255.21",
     :os         => "hashicorp/bionic64",
     :cpu        => "1",
-    :memory_mb  => "1024",
+    :memory_mb  => "2048",
     :salt_type  => "minion"
   },
   {
-    :node       => "vaulthaproxy02",
+    :node       => "consulserver02",
     :ip         => "192.168.255.22",
     :os         => "hashicorp/bionic64",
     :cpu        => "1",
-    :memory_mb  => "1024",
+    :memory_mb  => "2048",
     :salt_type  => "minion"
   },
   {
-    :node       => "vault01",
+    :node       => "consulserver03",
+    :ip         => "192.168.255.23",
+    :os         => "hashicorp/bionic64",
+    :cpu        => "1",
+    :memory_mb  => "2048",
+    :salt_type  => "minion"
+  },
+  {
+    :node       => "consulclient01",
     :ip         => "192.168.255.31",
     :os         => "hashicorp/bionic64",
     :cpu        => "1",
-    :memory_mb  => "1024",
+    :memory_mb  => "2048",
     :salt_type  => "minion"
   },
   {
-    :node       => "vault02",
+    :node       => "consulclient02",
     :ip         => "192.168.255.32",
     :os         => "hashicorp/bionic64",
     :cpu        => "1",
-    :memory_mb  => "1024",
+    :memory_mb  => "2048",
     :salt_type  => "minion"
   },
   {
-    :node       => "vault03",
-    :ip         => "192.168.255.33",
+    :node       => "testclient01",
+    :ip         => "192.168.255.41",
     :os         => "hashicorp/bionic64",
     :cpu        => "1",
-    :memory_mb  => "1024",
-    :salt_type  => "minion"
-  },
-  {
-    :node       => "vault04",
-    :ip         => "192.168.255.34",
-    :os         => "hashicorp/bionic64",
-    :cpu        => "1",
-    :memory_mb  => "1024",
-    :salt_type  => "minion"
-  },
-  {
-    :node       => "vault05",
-    :ip         => "192.168.255.35",
-    :os         => "hashicorp/bionic64",
-    :cpu        => "1",
-    :memory_mb  => "1024",
+    :memory_mb  => "2048",
     :salt_type  => "minion"
   }
 ]
 
 minion_keys_list = {
-  "vaulthaproxy01" => "saltstack/keys/vaulthaproxy01.pub",
-  "vaulthaproxy02" => "saltstack/keys/vaulthaproxy02.pub",
-  "vault01" => "saltstack/keys/vault01.pub",
-  "vault02" => "saltstack/keys/vault02.pub",
-  "vault03" => "saltstack/keys/vault03.pub",
-  "vault04" => "saltstack/keys/vault04.pub",
-  "vault05" => "saltstack/keys/vault05.pub"
+#  "consulserver01" => "saltstack/keys/master_minion.pub"
+  "consulserver01" => "saltstack/keys/consulserver01.pub",
+  "consulserver02" => "saltstack/keys/consulserver02.pub",
+  "consulserver03" => "saltstack/keys/consulserver03.pub",
+  "consulclient01" => "saltstack/keys/consulclient01.pub",
+  "consulclient02" => "saltstack/keys/consulclient02.pub",
+  "testclient01" => "saltstack/keys/testclient01.pub"
  }
 
 Vagrant.configure("2") do |config|
