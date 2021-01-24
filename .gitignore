@@ -1,0 +1,2 @@
+saltstack/salt/files/consul/*
+!saltstack/salt/files/consul/placeholder
