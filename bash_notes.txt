@@ -1,0 +1,26 @@
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+sudo apt-get update
+sudo apt-cache policy consul
+apt-get install consul=1.9.2
+consul
+exit
+history
+consul keygen
+H8f3Amm/vnPKtXiTcJHXUI1nj7tAPm7mpGqZZy43SEs=
+consul tls ca create
+ls
+nano gossip.key
+consul tls cert create -server -dc dc1
+ls
+consul tls cert create -client -dc dc1
+ls
+consul tls cert create -server -dc dc1
+ls
+ls -la
+ls -l
+cat dc1-server-consul-1*
+history
+ls -la
+cat .bash_history 
+exit
