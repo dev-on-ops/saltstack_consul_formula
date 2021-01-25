@@ -24,3 +24,133 @@ history
 ls -la
 cat .bash_history 
 exit
+# consul.hcl config for all systems, need to set flags for server and server expect seperate, 
+# all clients get secret token for gossip encryption traffic specific to a datacenter.
+# confirmed if gossip encryption is on then every consul config needs the key
+# 
+sudo touch /etc/consul.d/server.hcl
+sudo chown --recursive consul:consul /etc/consul.d
+sudo chmod 640 /etc/consul.d/server.hcl
+
+server = true
+bootstrap_expect = 3
+client_addr = 192.168.255.21
+ui = true
+
+
+# enable with default deny means have to generate acl bootstrap
+# can do allow to avoid in the short term but have to set on all nodes
+# not sure if has to be set on clients and servers.
+
+acl = {
+  enabled = true
+  default_policy = "allow"
+  enable_token_persistence = true
+}
+
+
+# creates tokens needed for management moving forward, should go into vault
+consul acl bootstrap
+
+# setting token on enviornment variable for manual steps
+export CONSUL_HTTP_TOKEN=fad6b7bd-2462-75c3-4647-711c369553b2
+
+
+# creating agent policy, for each node with specific node name for token
+# loop this for every agent in the environment, 
+# this is kinda crazy I understand why, 
+# salt is a must to accomplish this.
+
+node "consulserver01" {
+  policy = "write"
+}
+
+consul acl policy create \
+  -name consulserver01 \
+  -rules @consulserver01-policy.hcl
+
+# Note about tokens: can use seperate token for service from the agent so use this for just the node
+# Note about tokens: service token can be generated with consul template and used in service definition also.
+
+############################
+# create token for each node
+consul acl token create -description "consulserver01 agent token" \
+  -policy-name consulserver01
+############################
+AccessorID:       e7540965-a668-cb66-e0a5-57586b4196f6
+SecretID:         f7e48d36-d865-c67e-f702-0b33cfd64b34
+Description:      consulserver01 agent token
+Local:            false
+Create Time:      2021-01-24 23:53:02.440923412 +0000 UTC
+Policies:
+   71e377e5-0063-efa5-76c5-08beabaf616d - consulserver01
+
+AccessorID:       49f12496-6d9a-fc94-a984-da2bf0808631
+SecretID:         25182431-c63c-dcc6-3161-514ba484c157
+Description:      consulserver02 agent token
+Local:            false
+Create Time:      2021-01-24 23:54:07.404034977 +0000 UTC
+Policies:
+   71154aaa-c201-690b-05db-9eacf8c4b03e - consulserver02
+
+AccessorID:       63b70f33-92cb-925a-650f-098de4e71536
+SecretID:         a4d7b78d-e53b-a571-efa8-1e6515583758
+Description:      consulserver03 agent token
+Local:            false
+Create Time:      2021-01-24 23:54:36.990345439 +0000 UTC
+Policies:
+   c306c8e0-c9d4-0737-6e4f-dc7915c15c5a - consulserver03
+
+AccessorID:       ae51befc-8dfd-1c89-dbe4-ad07cd3f018c
+SecretID:         37ceb26a-2efa-4b60-35e8-90ceadc814b5
+Description:      consulclient01 agent token
+Local:            false
+Create Time:      2021-01-24 23:55:23.872843417 +0000 UTC
+Policies:
+   3dcee1f5-688c-ea6d-311b-199099a8da3c - consulclient01
+
+AccessorID:       f768ba2d-b195-28ad-ea75-ed200a63371a
+SecretID:         25dc9fd6-d195-b7e4-7cba-ff4b9520b07b
+Description:      consulclient02 agent token
+Local:            false
+Create Time:      2021-01-24 23:56:36.891324518 +0000 UTC
+Policies:
+   b7c78926-c7ab-32dd-034a-d03ec9cadfd4 - consulclient02
+
+#############################
+consulserver01: f7e48d36-d865-c67e-f702-0b33cfd64b34
+consulserver02: 25182431-c63c-dcc6-3161-514ba484c157
+consulserver03: a4d7b78d-e53b-a571-efa8-1e6515583758
+consulclient01: 37ceb26a-2efa-4b60-35e8-90ceadc814b5
+consulclient02: 25dc9fd6-d195-b7e4-7cba-ff4b9520b07b
+#############################
+# example of agent token value
+acl_agent_token = "37ceb26a-2efa-4b60-35e8-90ceadc814b5"
+#############################
+###################################
+# create service policy
+service "dashboard" {
+  policy = "write"
+}
+# create policy
+consul acl policy create -name "example1-service" -rules @/vagrant/misc/example1-policy.hcl
+
+# create token for service with policy
+consul acl token create -description "Token for example1 service" -policy-name example1-service
+
+#######################################
+AccessorID:       bc178544-ca4b-b509-2e2c-6a78abb4b7d9
+SecretID:         f792a558-00ee-677b-a415-6454fcae976b
+Description:      Token for example1 service
+Local:            false
+Create Time:      2021-01-25 01:17:57.486586009 +0000 UTC
+Policies:
+   f2b2341c-88a2-c270-c86e-07e1c623574b - example1-service
+#######################################
+f792a558-00ee-677b-a415-6454fcae976b
+
+# updated agent.hcl to deny and everything is working
+#######################################
+# DNS Lookups. Need to update anonymous token to allow dns queries
+# can create policy and attach to anonymous
+
