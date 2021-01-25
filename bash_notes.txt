@@ -152,5 +152,11 @@ f792a558-00ee-677b-a415-6454fcae976b
 # updated agent.hcl to deny and everything is working
 #######################################
 # DNS Lookups. Need to update anonymous token to allow dns queries
-# can create policy and attach to anonymous
-
+# can create policy and attach to anonymous for nodes
+consul acl policy create -name 'list-all-nodes' -rules 'node_prefix "" { policy = "read" }'
+# update anonymous token with 
+consul acl token update -id 00000000-0000-0000-0000-000000000002 -policy-name list-all-nodes -description "Anonymous Token - Can List Nodes"
+# create policy to allow for all services to be read
+consul acl policy create -name 'read-all-services' -rules 'service "" { policy = "read" }'
+# merge policies on anonymous token
+consul acl token update -id 00000000-0000-0000-0000-000000000002 --merge-policies -description "Anonymous Token - Can List Nodes" -policy-name read-all-services
