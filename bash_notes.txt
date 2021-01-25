@@ -157,6 +157,6 @@ consul acl policy create -name 'list-all-nodes' -rules 'node_prefix "" { policy 
 # update anonymous token with 
 consul acl token update -id 00000000-0000-0000-0000-000000000002 -policy-name list-all-nodes -description "Anonymous Token - Can List Nodes"
 # create policy to allow for all services to be read
-consul acl policy create -name 'read-all-services' -rules 'service "" { policy = "read" }'
+consul acl policy create -name 'read-all-services' -rules 'service_prefix "" { policy = "read" }'
 # merge policies on anonymous token
 consul acl token update -id 00000000-0000-0000-0000-000000000002 --merge-policies -description "Anonymous Token - Can List Nodes" -policy-name read-all-services
