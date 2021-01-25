@@ -1,1 +1,9 @@
 # saltstack_consul_formula
+
+Developing this code I am highlighting the process so others can understand what needed to be done to get the code built and working.
+
+1. manually configure an environment to understand how consul works and how to secure it. Hashicorp has excellent documentation and this step really is not optional. You can't reliably support something you don't understand. Write lots of notes along the way.
+2. list your takeaways and what was important about setting up the solution from the Vendors perspective. A big focus in docuemntation and how the solution is designed was to limit access by default and enable access that exposes the least amount of risk.
+3. Set expectations for your own risk. Some examples I set the ACL policies to deny all per best practices but enabled services to be able to be read by the anonymouse token so that dns queries would work for unauthenticated users. This was important to me because even if you do not use the advanced networking features there is value in external entities being able to use an advanced health checked dns service to access their applications and being able to avoid addoitional load balancer layers in east to west access patterns or in some cases even north and south networking workloads.
+4. write and test the code. Vagrant is wonderful because at the end of the day you can destroy and recreate the environment or simulate failures and you don't need anything more then a beefy laptop with a lot of ram and patience.
+5. test it in the real world and share. There is nothing like being able to publish what you have worked so hard on and share it with the rest of the world to enable others and help teach from your experiences. We all need to learn and grow, this is just another means of teaching at the end of the day.
