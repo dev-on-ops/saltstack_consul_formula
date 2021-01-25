@@ -1,0 +1,8 @@
+1. install consul service and binary on 3 to 5 nodes
+2. generate gossip encryption key
+3. get signed certificates or setup consul template for certificates
+4. create server configs with acl enabled, listeners, ui, server
+5. run acl bootstrap and store master key in vault
+6. setup acl's for nodes to register themselves and basic services to work and consul template with vault intergration for client tokens including servers
+7. setup acl's for services and service proxies, setup token vault intergration for service tokens and consul template
+8. Maintain with services being registered automatically and tokens created on demand
