@@ -160,3 +160,40 @@ consul acl token update -id 00000000-0000-0000-0000-000000000002 -policy-name li
 consul acl policy create -name 'read-all-services' -rules 'service_prefix "" { policy = "read" }'
 # merge policies on anonymous token
 consul acl token update -id 00000000-0000-0000-0000-000000000002 --merge-policies -description "Anonymous Token - Can List Nodes" -policy-name read-all-services
+
+###########################################
+# setting up consul connect for testing
+#
+# add this to server.hcl on consul servers
+
+connect {
+  enabled = true
+}
+
+##########################################
+# Starting the servers
+PORT=9003 ./counting
+PORT=9002 ./dashboard
+
+##########################################
+# had to add these to service token to be able to connect
+
+# this allows sidecar proxy to be registered
+service "servicename-sidecar-proxy" {
+  policy = "write"
+}
+# This allows the token to lookup all services available
+service_prefix "" {
+  policy = "read"
+}
+# This allows the token to look all nodes available
+node_prefix "" {
+  policy = "read"
+}
+
+##########################################
+# creating intention between services
+# defaults to allow intention, use -deny for deny rules
+consul intention create example2 example1
+
+#########################################
