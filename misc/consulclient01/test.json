@@ -29,7 +29,7 @@
   ],
   "service": {
     "name": "test",
-    "id": "test-1",
+    "id": "test",
     "port": 9003,
     "connect": { "sidecar_service": {} },
     "token": "59689c7d-77f5-f802-b2fe-a57fe27824c6",

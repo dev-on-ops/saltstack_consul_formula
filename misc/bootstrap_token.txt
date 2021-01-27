@@ -1,7 +1,0 @@
-AccessorID:       db58e948-ac15-ef34-5b9f-d4b76c56b714
-SecretID:         fad6b7bd-2462-75c3-4647-711c369553b2
-Description:      Bootstrap Token (Global Management)
-Local:            false
-Create Time:      2021-01-24 21:57:52.306171776 +0000 UTC
-Policies:
-   00000000-0000-0000-0000-000000000001 - global-management

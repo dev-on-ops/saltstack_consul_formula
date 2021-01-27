@@ -1,0 +1,159 @@
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+sudo apt-get update
+
+sudo apt-get update && sudo apt-get install nomad
+
+##################################
+
+nano /etc/nomad.d/server.hcl
+
+########
+# /etc/nomad.d/server.hcl
+
+# data_dir tends to be environment specific.
+data_dir = "/opt/nomad/data"
+
+server {
+  enabled          = true
+  bootstrap_expect = 3
+}
+
+consul {
+  token = "d88198c0-8e39-e271-0f47-cf525bc7c866"
+}
+
+server_join {
+  retry_join = ["192.168.255.61:4648","192.168.255.62:4648","192.168.255.63:4648"]
+}
+
+bind_addr = "0.0.0.0"
+
+advertise {
+  http = "192.168.255.63"
+  rpc  = "192.168.255.63"
+  serf = "192.168.255.63"
+}
+
+client {
+  enabled           = true
+  network_interface = "eth1"
+  servers           = ["192.168.255.61", "192.168.255.62", "192.168.255.63"]
+}
+########
+
+apt install consul
+
+
+############################
+
+mv /etc/nomad.d/nomad.hcl /etc/nomad.d/nomad.hcl.old
+
+############################
+# Client Configuration #
+
+# /etc/nomad.d/client.hcl
+
+datacenter = "dc1"
+
+# data_dir tends to be environment specific.
+data_dir = "/opt/nomad/data"
+
+client {
+  enabled           = true
+  network_interface = "eth1"
+  servers           = ["192.168.255.61", "192.168.255.62", "192.168.255.63"]
+}
+#################################
+# bootstrap the management token
+nomad acl bootstrap
+
+Accessor ID  = ec571378-b26f-c70e-ecc6-b0a20c42d28d
+Secret ID    = 38675680-37fc-2625-ad06-264e38567732
+Name         = Bootstrap Token
+Type         = management
+Global       = true
+Policies     = n/a
+Create Time  = 2021-01-27 04:48:30.946905501 +0000 UTC
+Create Index = 115
+Modify Index = 115
+#################################
+# export nomad token
+export NOMAD_TOKEN="38675680-37fc-2625-ad06-264e38567732"
+
+#################################
+# prep anonymous policy
+
+namespace "*" {
+  policy       = "write"
+  capabilities = ["alloc-node-exec"]
+}
+
+agent {
+  policy = "write"
+}
+
+operator {
+  policy = "write"
+}
+
+quota {
+  policy = "write"
+}
+
+node {
+  policy = "write"
+}
+
+host_volume "*" {
+  policy = "write"
+}
+
+#################################
+# Create policy from below:
+nomad acl policy apply -description "Anonymous policy (full-access)" anonymous anonymous.policy.hcl
+
+#################################
+# unset token and test nomad
+
+unset NOMAD_TOKEN
+echo ${NOMAD_TOKEN}
+nomad status
+
+#################################
+# install docker on nodes for example job
+sudo apt update
+sudo apt install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+sudo apt update
+apt-cache policy docker-ce
+sudo apt install docker-ce
+sudo systemctl status docker
+
+
+##############################
+# setup cni
+curl -L -o cni-plugins.tgz https://github.com/containernetworking/plugins/releases/download/v0.8.1/cni-plugins-linux-amd64-v0.8.1.tgz
+sudo mkdir -p /opt/cni/bin
+sudo tar -C /opt/cni/bin -xzf cni-plugins.tgz
+
+################################
+# setup envoy
+
+curl -L https://getenvoy.io/cli | sudo bash -s -- -b /usr/local/bin
+getenvoy run standard:1.16.0 -- --version
+sudo cp ~/.getenvoy/builds/standard/1.16.0/linux_glibc/bin/envoy /usr/local/bin/
+envoy --version
+
+
+################################
+# enable grpc on consul agents
+# go figure out the json value for this
+ports {
+  "grpc" = 8502
+}
+
+################################
+# need to figure out the csi driver for this and if quobyte will work
+################################

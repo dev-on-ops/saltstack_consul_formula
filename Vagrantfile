@@ -54,6 +54,54 @@ vagrant_nodes = [
     :cpu        => "1",
     :memory_mb  => "2048",
     :salt_type  => "minion"
+  },
+  {
+    :node       => "consulvault01",
+    :ip         => "192.168.255.51",
+    :os         => "hashicorp/bionic64",
+    :cpu        => "1",
+    :memory_mb  => "2048",
+    :salt_type  => "minion"
+  },
+  {
+    :node       => "consulvault02",
+    :ip         => "192.168.255.51",
+    :os         => "hashicorp/bionic64",
+    :cpu        => "1",
+    :memory_mb  => "2048",
+    :salt_type  => "minion"
+  },
+  {
+    :node       => "consulvault03",
+    :ip         => "192.168.255.51",
+    :os         => "hashicorp/bionic64",
+    :cpu        => "1",
+    :memory_mb  => "2048",
+    :salt_type  => "minion"
+  },
+  {
+    :node       => "consulnomad01",
+    :ip         => "192.168.255.61",
+    :os         => "hashicorp/bionic64",
+    :cpu        => "1",
+    :memory_mb  => "2048",
+    :salt_type  => "minion"
+  },
+  {
+    :node       => "consulnomad02",
+    :ip         => "192.168.255.62",
+    :os         => "hashicorp/bionic64",
+    :cpu        => "1",
+    :memory_mb  => "2048",
+    :salt_type  => "minion"
+  },
+  {
+    :node       => "consulnomad03",
+    :ip         => "192.168.255.63",
+    :os         => "hashicorp/bionic64",
+    :cpu        => "1",
+    :memory_mb  => "2048",
+    :salt_type  => "minion"
   }
 ]
 
@@ -64,7 +112,13 @@ minion_keys_list = {
   "consulserver03" => "saltstack/keys/consulserver03.pub",
   "consulclient01" => "saltstack/keys/consulclient01.pub",
   "consulclient02" => "saltstack/keys/consulclient02.pub",
-  "testclient01" => "saltstack/keys/testclient01.pub"
+  "testclient01" => "saltstack/keys/testclient01.pub",
+  "consulvault01" => "saltstack/keys/consulvault01.pub",
+  "consulvault02" => "saltstack/keys/consulvault02.pub",
+  "consulvault03" => "saltstack/keys/consulvault03.pub",
+  "consulnomad01" => "saltstack/keys/consulnomad01.pub",
+  "consulnomad02" => "saltstack/keys/consulnomad02.pub",
+  "consulnomad03" => "saltstack/keys/consulnomad03.pub",
  }
 
 Vagrant.configure("2") do |config|
