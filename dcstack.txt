@@ -1,0 +1,116 @@
+Concept:
+1. Everything is commodity, everything below can run with 3 servers but should start with 4 for n+1/maintenance
+2. Network should be simple and flat if possible, why? IP access controls are past their prime and identity must be leverage to establish security, subnetting and limiting access north and south creates bottlenecks
+3. Focused on the service and not the infrastructure, everything below is meant to provide the platform to launch services and manage their lifecycle so customers don't have to.
+
+Action items:
+1. build packer image for bootstrap server (vault, consul, nomad, prometheus, elk, openldap, git)
+2. build packer image for cluster nodes (vault, consul, nomad, prometheus, elk, openldap, git)
+3. standard config file for services
+
+bootstrapping a data center:
+0. design - how does it work and how does it grow
+    - network:
+        - transit: define the in and out of the locaiton
+        - core: define the connections between AZs
+        - edge: define what is in the parimeter and what can access what
+    - physical layer:
+        - rack elevation: what do you need in a rack and how much of it
+        - rack layout: how many racks and how much power/cooling
+    - logical layer:
+        - isolation: do you need seperation by tenant
+        - connectivity: do you need seperate spaces or large broadcast domain
+        - AZ: do you have multiple logical areas to distribute resources
+    - action:
+        - network: hardware and external providers
+        - physical: who, what, and evironmental needs of locaiton
+        - logical: what needs to be setup and when
+
+1. bootstrap - packer + terraform + ansible
+    - packer build image of deploy server
+        - kvm, docker, go binary of deploy server, config file
+    - terraform launch instance of service
+        - docker, go binary of deploy server, config file
+    - ansible to build bare metal systems for deploy
+        - packer image + boot image + install media method (ipmi, iso, usb)
+
+2. deploy - what I am building + terraform
+    - pxe booting server
+    - asset inventory
+    - profile assignment
+    - local storage replicated via raft
+    - terraform capable system
+    - bmc management
+
+3. secrets - vault
+    - kv store
+    - certificate authority
+    - consul encryption key storage
+    - app role tokens and policies for consul
+    - local storage replicated via raft
+
+4. connectivity - consul
+    - connect proxy with envoy
+    - acl bootstrap
+    - certificate authority signed by vault
+    - local storage replicated via raft
+
+5. scheduling - nomad
+    - acl bootstrapped
+    - namespaces for metrics
+    - namespaces for logging
+    - local storage replicated via raft
+
+6. metrics - prometheus
+    - core metrics from 1 - 5 stored
+    - other metrics tracked seperately
+    - local storage replicated via raft
+
+7. logging - elastistack
+    - core logs from 1 - 5 stored
+    - other logs stored seperately
+    - logstash frontends consul round robin
+    - local storage replicated via raft
+
+8. graphs, alerts - grafana
+    - pulling from management cluster resources
+    - triggers and alerting
+
+9. storage fs/s3 - quobyte
+    - s3 gateways with consul for dns round robin
+    - fs via quobtye client
+
+10. identity - boundary + openldap + vault ssh ca
+    - remote access via boundary and populated from consul
+    - openldap for user identity, groups authentication
+    - vault ssh ca for authenticaiton of users to systems
+
+11. rational database - mysql + vault
+    - vault for access credential for application or user
+    - mysql cluster for data persistence and performance
+    - mysql router + consul for router discovery and load balancing
+
+12. Worker - packer image with agents and prequisites
+    - docker
+    - consul agent
+    - nomad agent
+    - vault agent
+    - kvm / QEMU
+    - envoy / CNI
+    - quobyte client
+    - prometheus exporter
+    - consul template
+    - file beat agent
+
+13. source control and versioning - production git / gitea
+    - git server or servers
+    - check stuff in and out
+    - gitlab or github enterprise if needed
+
+14. ci/cd pipeline - jenkins
+    - build or manage other tools
+    - schedule reoccuring tasks or jobs
+    - kick off migrations and changes from source
+
+15. kits - the how do we do what we do
+    - examples, instructions and teaching

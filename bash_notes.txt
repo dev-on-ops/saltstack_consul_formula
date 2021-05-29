@@ -55,6 +55,7 @@ consul acl bootstrap
 # setting token on enviornment variable for manual steps
 export CONSUL_HTTP_TOKEN=fad6b7bd-2462-75c3-4647-711c369553b2
 
+# - need to use service token at command line in order to start sidecar
 
 # creating agent policy, for each node with specific node name for token
 # loop this for every agent in the environment, 
